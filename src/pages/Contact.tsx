@@ -1,5 +1,6 @@
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
 import { useState } from 'react';
+import EditableText from '../components/EditableText';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -37,18 +38,22 @@ export default function Contact() {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-blue-900/80"></div>
         <div className="relative z-10 text-center px-4">
-          <h1
+          <EditableText
+            page="contact"
+            section="hero_title"
+            defaultValue="Contact Us"
+            tag="h1"
             className="text-5xl md:text-6xl font-bold text-white mb-4"
             style={{ fontFamily: 'Times New Roman, serif' }}
-          >
-            Contact Us
-          </h1>
-          <p
+          />
+          <EditableText
+            page="contact"
+            section="hero_subtitle"
+            defaultValue="We'd Love to Hear From You"
+            tag="p"
             className="text-xl text-gray-100"
             style={{ fontFamily: 'Calibri, sans-serif' }}
-          >
-            We'd Love to Hear From You
-          </p>
+          />
         </div>
       </section>
 
@@ -62,12 +67,14 @@ export default function Contact() {
               >
                 Get in Touch
               </h2>
-              <p
+              <EditableText
+                page="contact"
+                section="intro_text"
+                defaultValue="Have questions about our products or services? We're here to help. Reach out to us and we'll respond as soon as possible."
+                tag="p"
                 className="text-lg text-gray-600 mb-8"
                 style={{ fontFamily: 'Calibri, sans-serif', lineHeight: '1.6' }}
-              >
-                Have questions about our products or services? We're here to help. Reach out to us and we'll respond as soon as possible.
-              </p>
+              />
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
@@ -75,18 +82,22 @@ export default function Contact() {
                     <Phone className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <h3
+                    <EditableText
+                      page="contact"
+                      section="phone_label"
+                      defaultValue="Phone"
+                      tag="h3"
                       className="text-lg font-bold mb-1"
                       style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
-                    >
-                      Phone
-                    </h3>
-                    <p
+                    />
+                    <EditableText
+                      page="contact"
+                      section="phone_value"
+                      defaultValue="0772792147"
+                      tag="p"
                       className="text-gray-600"
                       style={{ fontFamily: 'Calibri, sans-serif' }}
-                    >
-                      0772792147
-                    </p>
+                    />
                   </div>
                 </div>
 
@@ -95,18 +106,22 @@ export default function Contact() {
                     <Mail className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3
+                    <EditableText
+                      page="contact"
+                      section="email_label"
+                      defaultValue="Email"
+                      tag="h3"
                       className="text-lg font-bold mb-1"
                       style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
-                    >
-                      Email
-                    </h3>
-                    <p
+                    />
+                    <EditableText
+                      page="contact"
+                      section="email_value"
+                      defaultValue="monicamutale23@gmail.com"
+                      tag="p"
                       className="text-gray-600"
                       style={{ fontFamily: 'Calibri, sans-serif' }}
-                    >
-                      monicamutale23@gmail.com
-                    </p>
+                    />
                   </div>
                 </div>
 
@@ -115,47 +130,55 @@ export default function Contact() {
                     <MapPin className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
-                    <h3
+                    <EditableText
+                      page="contact"
+                      section="location_label"
+                      defaultValue="Location"
+                      tag="h3"
                       className="text-lg font-bold mb-1"
                       style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
-                    >
-                      Location
-                    </h3>
-                    <p
+                    />
+                    <EditableText
+                      page="contact"
+                      section="location_value"
+                      defaultValue="Zambia"
+                      tag="p"
                       className="text-gray-600"
                       style={{ fontFamily: 'Calibri, sans-serif' }}
-                    >
-                      Zambia
-                    </p>
+                    />
                   </div>
                 </div>
               </div>
 
               <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl">
-                <h3
+                <EditableText
+                  page="contact"
+                  section="hours_title"
+                  defaultValue="Business Hours"
+                  tag="h3"
                   className="text-xl font-bold mb-3"
                   style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
-                >
-                  Business Hours
-                </h3>
-                <div
-                  className="space-y-2 text-gray-600"
+                />
+                <EditableText
+                  page="contact"
+                  section="hours_text"
+                  defaultValue="Monday - Friday: 8:00 AM - 5:00 PM\nSaturday: 9:00 AM - 2:00 PM\nSunday: Closed"
+                  tag="div"
+                  className="space-y-2 text-gray-600 whitespace-pre-line"
                   style={{ fontFamily: 'Calibri, sans-serif' }}
-                >
-                  <p>Monday - Friday: 8:00 AM - 5:00 PM</p>
-                  <p>Saturday: 9:00 AM - 2:00 PM</p>
-                  <p>Sunday: Closed</p>
-                </div>
+                />
               </div>
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-8">
-              <h3
+              <EditableText
+                page="contact"
+                section="form_title"
+                defaultValue="Send Us a Message"
+                tag="h3"
                 className="text-2xl font-bold mb-6"
                 style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
-              >
-                Send Us a Message
-              </h3>
+              />
 
               {submitted ? (
                 <div className="bg-green-50 border-2 border-green-500 rounded-lg p-6 text-center">
