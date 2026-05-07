@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Leaf, Award, Users, Heart } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../context/AuthContext';
 import EditableText from '../components/EditableText';
-import EditableCard from '../components/EditableCard';
-import EditModal from '../components/EditModal';
-import AddCardForm from '../components/AddCardForm';
 
 interface FeatureCard {
   section: string;
@@ -37,12 +33,8 @@ const defaultFeatureCards: FeatureCard[] = [
 ];
 
 export default function Home() {
-  const { isAdmin } = useAuth();
   const [featureCards, setFeatureCards] = useState<FeatureCard[]>(defaultFeatureCards);
   const [loadingFeatures, setLoadingFeatures] = useState(true);
-  const [editingFeature, setEditingFeature] = useState<FeatureCard | null>(null);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [draftFeature, setDraftFeature] = useState({ title: '', description: '' });
 
   useEffect(() => {
     fetchFeatureCards();
@@ -90,42 +82,6 @@ export default function Home() {
     }
   }
 
-  function openFeatureModal(card: FeatureCard) {
-    setEditingFeature(card);
-    setDraftFeature({ title: card.title, description: card.description });
-    setIsEditOpen(true);
-  }
-
-  async function saveFeature() {
-    if (!editingFeature) {
-      return;
-    }
-
-    try {
-      await supabase.from('site_content').upsert({
-        page: 'home',
-        section: editingFeature.section,
-        content: JSON.stringify({ title: draftFeature.title, description: draftFeature.description }),
-      }, { onConflict: ['page', 'section'] });
-      await fetchFeatureCards();
-      setIsEditOpen(false);
-    } catch (error) {
-      console.error('Error saving home feature:', error);
-    }
-  }
-
-  async function deleteFeature(section: string) {
-    if (!confirm('Delete this feature card?')) {
-      return;
-    }
-
-    try {
-      await supabase.from('site_content').delete().eq('page', 'home').eq('section', section);
-      await fetchFeatureCards();
-    } catch (error) {
-      console.error('Error deleting feature:', error);
-    }
-  }
 
   const getIconForFeature = (section: string) => {
     if (section.endsWith('1')) return <Leaf className="w-8 h-8" />;
@@ -214,30 +170,26 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {(loadingFeatures ? defaultFeatureCards : featureCards).map((feature) => (
-              <EditableCard
+              <div
                 key={feature.section}
-                isAdmin={isAdmin}
-                onEdit={() => openFeatureModal(feature)}
-                onDelete={() => deleteFeature(feature.section)}
+                className="text-center p-6 rounded-xl bg-gray-50 hover:bg-green-50 transition-all hover:shadow-lg transform hover:-translate-y-1"
               >
-                <div className="text-center p-6 rounded-xl bg-gray-50 hover:bg-green-50 transition-all hover:shadow-lg transform hover:-translate-y-1">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-4">
-                    {getIconForFeature(feature.section)}
-                  </div>
-                  <h3
-                    className="text-xl font-bold mb-2"
-                    style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
-                  >
-                    {feature.title}
-                  </h3>
-                  <p
-                    className="text-gray-600"
-                    style={{ fontFamily: 'Calibri, sans-serif', lineHeight: '1.5' }}
-                  >
-                    {feature.description}
-                  </p>
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mb-4">
+                  {getIconForFeature(feature.section)}
                 </div>
-              </EditableCard>
+                <h3
+                  className="text-xl font-bold mb-2"
+                  style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
+                >
+                  {feature.title}
+                </h3>
+                <p
+                  className="text-gray-600"
+                  style={{ fontFamily: 'Calibri, sans-serif', lineHeight: '1.5' }}
+                >
+                  {feature.description}
+                </p>
+              </div>
             ))}
           </div>
         </div>
@@ -297,57 +249,6 @@ export default function Home() {
         </div>
       </section>
 
-      {isAdmin && <AddCardForm mode="home_features" onSaved={fetchFeatureCards} />}
-
-      <EditModal
-        open={isEditOpen}
-        title="Edit Feature"
-        onClose={() => setIsEditOpen(false)}
-        actions={
-          <>
-            <button
-              type="button"
-              onClick={() => setIsEditOpen(false)}
-              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={saveFeature}
-              className="rounded-lg bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600"
-            >
-              Save
-            </button>
-          </>
-        }
-      >
-        <div className="space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Calibri, sans-serif' }}>
-              Feature Title
-            </label>
-            <input
-              value={draftFeature.title}
-              onChange={(event) => setDraftFeature((prev) => ({ ...prev, title: event.target.value }))}
-              className="w-full rounded-3xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
-              style={{ fontFamily: 'Calibri, sans-serif' }}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Calibri, sans-serif' }}>
-              Feature Description
-            </label>
-            <textarea
-              value={draftFeature.description}
-              onChange={(event) => setDraftFeature((prev) => ({ ...prev, description: event.target.value }))}
-              rows={4}
-              className="w-full resize-none rounded-3xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
-              style={{ fontFamily: 'Calibri, sans-serif' }}
-            />
-          </div>
-        </div>
-      </EditModal>
     </div>
   );
 }
