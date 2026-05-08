@@ -17,8 +17,13 @@ interface Product {
   display_order?: number;
 }
 
-export default function Products() {
+interface ProductsProps {
+  adminMode?: boolean;
+}
+
+export default function Products({ adminMode = false }: ProductsProps) {
   const { isAdmin } = useAuth();
+  const showAdminControls = isAdmin && adminMode;
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -36,6 +41,22 @@ export default function Products() {
 
   useEffect(() => {
     fetchProducts();
+
+    const channel = supabase
+      .channel('products-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        () => {
+          fetchProducts();
+        }
+      );
+
+    void channel.subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, []);
 
   async function fetchProducts() {
@@ -287,7 +308,7 @@ export default function Products() {
                   </div>
                 );
 
-                return products.length > 0 ? (
+                return showAdminControls ? (
                   <EditableCard
                     key={product.id}
                     isAdmin={isAdmin}
@@ -328,7 +349,7 @@ export default function Products() {
         </div>
       </section>
 
-      {isAdmin && <AddCardForm mode="products" onSaved={fetchProducts} />}
+      {showAdminControls && <AddCardForm mode="products" onSaved={fetchProducts} />}
 
       <EditModal
         open={isEditOpen}

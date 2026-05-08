@@ -15,8 +15,13 @@ interface GalleryItem {
   display_order?: number;
 }
 
-export default function Gallery() {
+interface GalleryProps {
+  adminMode?: boolean;
+}
+
+export default function Gallery({ adminMode = false }: GalleryProps) {
   const { isAdmin } = useAuth();
+  const showAdminControls = isAdmin && adminMode;
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -31,6 +36,22 @@ export default function Gallery() {
 
   useEffect(() => {
     fetchGalleryItems();
+
+    const channel = supabase
+      .channel('gallery-items-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'gallery_items' },
+        () => {
+          fetchGalleryItems();
+        }
+      );
+
+    void channel.subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, []);
 
   async function fetchGalleryItems() {
@@ -249,7 +270,7 @@ export default function Gallery() {
                   </div>
                 );
 
-                return items.length > 0 ? (
+                return showAdminControls ? (
                   <EditableCard
                     key={item.id}
                     isAdmin={isAdmin}
@@ -267,7 +288,7 @@ export default function Gallery() {
         </div>
       </section>
 
-      {isAdmin && <AddCardForm mode="gallery_items" onSaved={fetchGalleryItems} />}
+      {showAdminControls && <AddCardForm mode="gallery_items" onSaved={fetchGalleryItems} />}
 
       <EditModal
         open={isEditOpen}

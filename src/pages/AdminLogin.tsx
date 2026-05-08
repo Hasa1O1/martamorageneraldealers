@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { ArrowRight, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Products from './Products';
+import Gallery from './Gallery';
 
 export default function AdminLogin() {
   const { isAdmin, user, signIn, signOut, loading } = useAuth();
+  const [activeSection, setActiveSection] = useState<'products' | 'gallery'>('products');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -33,39 +36,70 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-16 px-4">
-      <div className="w-full max-w-2xl rounded-3xl bg-white p-10 shadow-2xl">
+    <div className="min-h-screen bg-gray-50 py-16 px-4">
+      <div className="mx-auto w-full max-w-7xl rounded-3xl bg-white p-8 shadow-2xl">
         {isAdmin && user ? (
-          <div className="space-y-6 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-white">
-              <LogOut className="h-8 w-8" />
+          <div className="space-y-8">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-3">
+                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-white lg:mx-0">
+                  <LogOut className="h-8 w-8" />
+                </div>
+                <div className="text-center lg:text-left">
+                  <h1 className="text-3xl font-bold" style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}>
+                    Admin Panel
+                  </h1>
+                  <p className="text-gray-600" style={{ fontFamily: 'Calibri, sans-serif' }}>
+                    Signed in as <span className="font-semibold text-gray-900">{user.email}</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  await signOut();
+                }}
+                className="inline-flex items-center gap-2 rounded-full bg-green-500 px-6 py-3 text-white shadow-lg transition hover:bg-green-600"
+                style={{ fontFamily: 'Calibri, sans-serif' }}
+              >
+                <LogOut className="h-5 w-5" />
+                Sign Out
+              </button>
             </div>
-            <h1 className="text-3xl font-bold" style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}>
-              Admin Logged In
-            </h1>
-            <p className="text-gray-600" style={{ fontFamily: 'Calibri, sans-serif' }}>
-              Signed in as <span className="font-semibold text-gray-900">{user.email}</span>
-            </p>
-            <button
-              type="button"
-              onClick={async () => {
-                await signOut();
-              }}
-              className="inline-flex items-center gap-2 rounded-full bg-green-500 px-6 py-3 text-white shadow-lg transition hover:bg-green-600"
-              style={{ fontFamily: 'Calibri, sans-serif' }}
-            >
-              <LogOut className="h-5 w-5" />
-              Sign Out
-            </button>
+
+            <div className="flex flex-wrap items-center gap-3 rounded-3xl bg-gray-100 p-4">
+              <button
+                type="button"
+                onClick={() => setActiveSection('products')}
+                className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
+                  activeSection === 'products' ? 'bg-green-500 text-white' : 'bg-white text-gray-700 shadow-sm'
+                }`}
+              >
+                Manage Products
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveSection('gallery')}
+                className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
+                  activeSection === 'gallery' ? 'bg-green-500 text-white' : 'bg-white text-gray-700 shadow-sm'
+                }`}
+              >
+                Manage Gallery
+              </button>
+            </div>
+
+            <div className="rounded-3xl bg-white p-4 shadow-inner">
+              {activeSection === 'products' ? <Products adminMode /> : <Gallery adminMode />}
+            </div>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="w-full max-w-2xl mx-auto space-y-8">
             <div className="text-center">
               <h1 className="text-4xl font-bold" style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}>
                 Admin Login
               </h1>
               <p className="mt-3 text-gray-600" style={{ fontFamily: 'Calibri, sans-serif' }}>
-                Use your Supabase admin credentials to manage content inline.
+                Use your Supabase admin credentials to manage content.
               </p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-6">
