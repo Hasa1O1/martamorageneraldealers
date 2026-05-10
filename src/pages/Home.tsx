@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Leaf, Award, Users, Heart } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import EditableText from "../components/EditableText";
+import type { PublicRoute } from "../appRoutes";
 
 interface FeatureCard {
   section: string;
@@ -34,9 +35,10 @@ const defaultFeatureCards: FeatureCard[] = [
 
 interface HomeProps {
   adminMode?: boolean;
+  onNavigate: (page: PublicRoute) => void;
 }
 
-export default function Home({ adminMode = false }: HomeProps) {
+export default function Home({ adminMode = false, onNavigate }: HomeProps) {
   const [featureCards, setFeatureCards] =
     useState<FeatureCard[]>(defaultFeatureCards);
   const [loadingFeatures, setLoadingFeatures] = useState(true);
@@ -140,12 +142,16 @@ export default function Home({ adminMode = false }: HomeProps) {
           />
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
+              type="button"
+              onClick={() => onNavigate("products")}
               className="px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
               style={{ fontFamily: "Calibri, sans-serif" }}
             >
               Explore Products
             </button>
             <button
+              type="button"
+              onClick={() => onNavigate("contact")}
               className="px-8 py-4 bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white font-semibold rounded-lg transition-all border-2 border-white"
               style={{ fontFamily: "Calibri, sans-serif" }}
             >
@@ -158,24 +164,22 @@ export default function Home({ adminMode = false }: HomeProps) {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <EditableText
-              page="home"
-              section="why_choose_title"
-              adminMode={adminMode}
-              defaultValue="Why Choose Martamora"
-              tag="h2"
+            <h2
               className="text-4xl md:text-5xl font-bold mb-4"
-              style={{ fontFamily: "Times New Roman, serif", color: "#754C29" }}
-            />
-            <EditableText
-              page="home"
-              section="why_choose_subtitle"
-              adminMode={adminMode}
-              defaultValue="We are committed to providing the highest quality herbal products with traditional knowledge and modern reliability."
-              tag="p"
+              style={{
+                fontFamily: "Times New Roman, serif",
+                color: "#754C29",
+              }}
+            >
+              Why Choose Martamora
+            </h2>
+            <p
               className="text-lg text-gray-600 max-w-2xl mx-auto"
               style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.5" }}
-            />
+            >
+              We are committed to providing the highest quality herbal products with
+              traditional knowledge and modern reliability.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -222,24 +226,20 @@ export default function Home({ adminMode = false }: HomeProps) {
       >
         <div className="absolute inset-0 bg-green-900/80"></div>
         <div className="relative z-10 max-w-4xl mx-auto text-center px-4">
-          <EditableText
-            page="home"
-            section="mission_title"
-            adminMode={adminMode}
-            defaultValue="Our Mission"
-            tag="h2"
+          <h2
             className="text-4xl md:text-5xl font-bold text-white mb-6"
             style={{ fontFamily: "Times New Roman, serif" }}
-          />
-          <EditableText
-            page="home"
-            section="mission_text"
-            adminMode={adminMode}
-            defaultValue="To provide our community with the highest quality, carefully sourced herbal products, leveraging traditional knowledge and reliable service to support holistic well-being."
-            tag="p"
+          >
+            Our Mission
+          </h2>
+          <p
             className="text-xl text-gray-100 mb-8"
             style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.6" }}
-          />
+          >
+            To provide our community with the highest quality, carefully sourced herbal
+            products, leveraging traditional knowledge and reliable service to support
+            holistic well-being.
+          </p>
         </div>
       </section>
 
@@ -264,6 +264,8 @@ export default function Home({ adminMode = false }: HomeProps) {
             style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.5" }}
           />
           <button
+            type="button"
+            onClick={() => onNavigate("contact")}
             className="px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
             style={{ fontFamily: "Calibri, sans-serif" }}
           >

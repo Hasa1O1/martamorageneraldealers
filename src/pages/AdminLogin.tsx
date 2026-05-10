@@ -3,15 +3,12 @@ import { LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Products from "./Products";
 import Gallery from "./Gallery";
-import Home from "./Home";
-import About from "./About";
-import Contact from "./Contact";
 
 export default function AdminLogin() {
   const { isAdmin, user, signIn, signOut, loading } = useAuth();
-  const [activeSection, setActiveSection] = useState<
-    "products" | "gallery" | "home" | "about" | "contact"
-  >("products");
+  const [activeSection, setActiveSection] = useState<"products" | "gallery">(
+    "products",
+  );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -68,9 +65,14 @@ export default function AdminLogin() {
                     style={{ fontFamily: "Calibri, sans-serif" }}
                   >
                     Signed in as{" "}
-                    <span className="font-semibold text-gray-900">
-                      {user.email}
-                    </span>
+                    <span className="font-semibold text-gray-900">{user.email}</span>
+                  </p>
+                  <p
+                    className="mt-2 text-sm text-gray-500"
+                    style={{ fontFamily: "Calibri, sans-serif" }}
+                  >
+                    Use the main navigation to edit Home, Products, or Contact copy on the
+                    live pages while signed in. Use the tabs below for card management.
                   </p>
                 </div>
               </div>
@@ -110,47 +112,11 @@ export default function AdminLogin() {
               >
                 Manage Gallery
               </button>
-              <button
-                type="button"
-                onClick={() => setActiveSection("home")}
-                className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
-                  activeSection === "home"
-                    ? "bg-green-500 text-white"
-                    : "bg-white text-gray-700 shadow-sm"
-                }`}
-              >
-                Edit Home
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveSection("about")}
-                className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
-                  activeSection === "about"
-                    ? "bg-green-500 text-white"
-                    : "bg-white text-gray-700 shadow-sm"
-                }`}
-              >
-                Edit About
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveSection("contact")}
-                className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
-                  activeSection === "contact"
-                    ? "bg-green-500 text-white"
-                    : "bg-white text-gray-700 shadow-sm"
-                }`}
-              >
-                Edit Contact
-              </button>
             </div>
 
             <div className="rounded-3xl bg-white p-4 shadow-inner">
               {activeSection === "products" && <Products adminMode />}
               {activeSection === "gallery" && <Gallery adminMode />}
-              {activeSection === "home" && <Home adminMode />}
-              {activeSection === "about" && <About adminMode />}
-              {activeSection === "contact" && <Contact adminMode />}
             </div>
           </div>
         ) : (

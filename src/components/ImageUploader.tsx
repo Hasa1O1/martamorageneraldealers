@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface ImageUploaderProps {
@@ -10,6 +10,10 @@ export default function ImageUploader({ value, onUpload }: ImageUploaderProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [preview, setPreview] = useState(value ?? '');
+
+  useEffect(() => {
+    setPreview(value ?? '');
+  }, [value]);
 
   async function handleFile(event: React.ChangeEvent<HTMLInputElement>) {
     setError('');

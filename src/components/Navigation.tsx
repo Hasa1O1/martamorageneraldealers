@@ -1,20 +1,21 @@
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import type { AppRoute, PublicRoute } from '../appRoutes';
 
 interface NavigationProps {
-  currentPage: string;
-  onNavigate: (page: string) => void;
+  currentPage: AppRoute;
+  onNavigate: (page: AppRoute) => void;
 }
 
 export default function Navigation({ currentPage, onNavigate }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const navItems = [
-    { id: 'home', label: 'HOME' },
-    { id: 'about', label: 'ABOUT US' },
-    { id: 'products', label: 'PRODUCTS' },
-    { id: 'gallery', label: 'GALLERY' },
-    { id: 'contact', label: 'CONTACT' },
+  const navItems: { id: PublicRoute; label: string }[] = [
+    { id: 'home', label: 'Home' },
+    { id: 'products', label: 'Products' },
+    { id: 'gallery', label: 'Gallery' },
+    { id: 'about', label: 'About' },
+    { id: 'contact', label: 'Contact' },
   ];
 
   return (

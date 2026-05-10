@@ -1,12 +1,43 @@
 import { Phone, Mail, MapPin, Send } from "lucide-react";
 import { useState } from "react";
 import EditableText from "../components/EditableText";
+import EditModal from "../components/EditModal";
+import { useSiteContentField } from "../hooks/useSiteContentField";
 
 interface ContactProps {
   adminMode?: boolean;
 }
 
+function buildMessageBody(formData: {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+}): string {
+  return [
+    "Hello Martamora,",
+    "",
+    `Name: ${formData.name}`,
+    `Email: ${formData.email}`,
+    `Phone: ${formData.phone || "—"}`,
+    "",
+    "Message:",
+    formData.message,
+  ].join("\n");
+}
+
+function whatsappDigits(phone: string): string {
+  return phone.replace(/\D/g, "");
+}
+
 export default function Contact({ adminMode = false }: ContactProps) {
+  const sitePhone = useSiteContentField("contact", "phone_value", "0772792147");
+  const siteEmail = useSiteContentField(
+    "contact",
+    "email_value",
+    "monicamutale23@gmail.com",
+  );
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -14,16 +45,7 @@ export default function Contact({ adminMode = false }: ContactProps) {
     message: "",
   });
 
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: "", email: "", phone: "", message: "" });
-    }, 3000);
-  };
+  const [channelModalOpen, setChannelModalOpen] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -33,6 +55,40 @@ export default function Contact({ adminMode = false }: ContactProps) {
       [e.target.name]: e.target.value,
     });
   };
+
+  function handleFormSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setChannelModalOpen(true);
+  }
+
+  function openWhatsApp() {
+    const digits = whatsappDigits(sitePhone);
+    const body = encodeURIComponent(buildMessageBody(formData));
+    if (!digits) {
+      window.alert(
+        "WhatsApp number is not set. Please add a phone number in Contact details (admin).",
+      );
+      return;
+    }
+    window.open(`https://wa.me/${digits}?text=${body}`, "_blank", "noopener,noreferrer");
+    setChannelModalOpen(false);
+    setFormData({ name: "", email: "", phone: "", message: "" });
+  }
+
+  function openEmailApp() {
+    const to = siteEmail.trim();
+    if (!to) {
+      window.alert(
+        "Email address is not set. Please add an email in Contact details (admin).",
+      );
+      return;
+    }
+    const subject = encodeURIComponent("Martamora website — contact message");
+    const body = encodeURIComponent(buildMessageBody(formData));
+    window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+    setChannelModalOpen(false);
+    setFormData({ name: "", email: "", phone: "", message: "" });
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,24 +101,18 @@ export default function Contact({ adminMode = false }: ContactProps) {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-blue-900/80"></div>
         <div className="relative z-10 text-center px-4">
-          <EditableText
-            page="contact"
-            section="hero_title"
-            adminMode={adminMode}
-            defaultValue="Contact Us"
-            tag="h1"
+          <h1
             className="text-5xl md:text-6xl font-bold text-white mb-4"
             style={{ fontFamily: "Times New Roman, serif" }}
-          />
-          <EditableText
-            page="contact"
-            section="hero_subtitle"
-            adminMode={adminMode}
-            defaultValue="We'd Love to Hear From You"
-            tag="p"
+          >
+            Contact Us
+          </h1>
+          <p
             className="text-xl text-gray-100"
             style={{ fontFamily: "Calibri, sans-serif" }}
-          />
+          >
+            We&apos;d Love to Hear From You
+          </p>
         </div>
       </section>
 
@@ -79,15 +129,16 @@ export default function Contact({ adminMode = false }: ContactProps) {
               >
                 Get in Touch
               </h2>
-              <EditableText
-                page="contact"
-                section="intro_text"
-                adminMode={adminMode}
-                defaultValue="Have questions about our products or services? We're here to help. Reach out to us and we'll respond as soon as possible."
-                tag="p"
+              <p
                 className="text-lg text-gray-600 mb-8"
-                style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.6" }}
-              />
+                style={{
+                  fontFamily: "Calibri, sans-serif",
+                  lineHeight: "1.6",
+                }}
+              >
+                Have questions about our products or services? We&apos;re here to help.
+                Reach out to us and we&apos;ll respond as soon as possible.
+              </p>
 
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
@@ -195,7 +246,9 @@ export default function Contact({ adminMode = false }: ContactProps) {
                   page="contact"
                   section="hours_text"
                   adminMode={adminMode}
-                  defaultValue="Monday - Friday: 8:00 AM - 5:00 PM\nSaturday: 9:00 AM - 2:00 PM\nSunday: Closed"
+                  defaultValue={
+                    "Monday - Friday: 8:00 AM - 5:00 PM\nSaturday: 9:00 AM - 2:00 PM\nSunday: Closed"
+                  }
                   tag="div"
                   className="space-y-2 text-gray-600 whitespace-pre-line"
                   style={{ fontFamily: "Calibri, sans-serif" }}
@@ -204,124 +257,142 @@ export default function Contact({ adminMode = false }: ContactProps) {
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-8">
-              <EditableText
-                page="contact"
-                section="form_title"
-                adminMode={adminMode}
-                defaultValue="Send Us a Message"
-                tag="h3"
+              <h3
                 className="text-2xl font-bold mb-6"
                 style={{
                   fontFamily: "Times New Roman, serif",
                   color: "#754C29",
                 }}
-              />
+              >
+                Send Us a Message
+              </h3>
 
-              {submitted ? (
-                <div className="bg-green-50 border-2 border-green-500 rounded-lg p-6 text-center">
-                  <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Send className="w-8 h-8 text-white" />
-                  </div>
-                  <h4
-                    className="text-xl font-bold text-green-700 mb-2"
-                    style={{ fontFamily: "Times New Roman, serif" }}
-                  >
-                    Message Sent!
-                  </h4>
-                  <p
-                    className="text-gray-600"
+              <form onSubmit={handleFormSubmit} className="space-y-6">
+                <div>
+                  <label
+                    className="block text-sm font-medium text-gray-700 mb-2"
                     style={{ fontFamily: "Calibri, sans-serif" }}
                   >
-                    Thank you for contacting us. We'll get back to you soon.
-                  </p>
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                    style={{ fontFamily: "Calibri, sans-serif" }}
+                  />
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                      style={{ fontFamily: "Calibri, sans-serif" }}
-                    >
-                      Full Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                      style={{ fontFamily: "Calibri, sans-serif" }}
-                    />
-                  </div>
 
-                  <div>
-                    <label
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                      style={{ fontFamily: "Calibri, sans-serif" }}
-                    >
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                      style={{ fontFamily: "Calibri, sans-serif" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                      style={{ fontFamily: "Calibri, sans-serif" }}
-                    >
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                      style={{ fontFamily: "Calibri, sans-serif" }}
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      className="block text-sm font-medium text-gray-700 mb-2"
-                      style={{ fontFamily: "Calibri, sans-serif" }}
-                    >
-                      Message
-                    </label>
-                    <textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      rows={5}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all resize-none"
-                      style={{ fontFamily: "Calibri, sans-serif" }}
-                    ></textarea>
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full px-6 py-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+                <div>
+                  <label
+                    className="block text-sm font-medium text-gray-700 mb-2"
                     style={{ fontFamily: "Calibri, sans-serif" }}
                   >
-                    <Send className="w-5 h-5" />
-                    Send Message
-                  </button>
-                </form>
-              )}
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                    style={{ fontFamily: "Calibri, sans-serif" }}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                    style={{ fontFamily: "Calibri, sans-serif" }}
+                  >
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
+                    style={{ fontFamily: "Calibri, sans-serif" }}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                    style={{ fontFamily: "Calibri, sans-serif" }}
+                  >
+                    Message
+                  </label>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                    rows={5}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all resize-none"
+                    style={{ fontFamily: "Calibri, sans-serif" }}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full px-6 py-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+                  style={{ fontFamily: "Calibri, sans-serif" }}
+                >
+                  <Send className="w-5 h-5" />
+                  Send Message
+                </button>
+              </form>
             </div>
           </div>
         </div>
       </section>
+
+      <EditModal
+        open={channelModalOpen}
+        title="How would you like to send your message?"
+        onClose={() => setChannelModalOpen(false)}
+        actions={
+          <button
+            type="button"
+            onClick={() => setChannelModalOpen(false)}
+            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+        }
+      >
+        <p
+          className="mb-6 text-gray-600"
+          style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.5" }}
+        >
+          Your message will open in WhatsApp or your email app with the details filled in.
+          We&apos;ll use the phone number and email shown in your contact details.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={openWhatsApp}
+            className="flex-1 rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white shadow transition hover:bg-green-700"
+            style={{ fontFamily: "Calibri, sans-serif" }}
+          >
+            WhatsApp
+          </button>
+          <button
+            type="button"
+            onClick={openEmailApp}
+            className="flex-1 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow transition hover:bg-blue-700"
+            style={{ fontFamily: "Calibri, sans-serif" }}
+          >
+            Email
+          </button>
+        </div>
+      </EditModal>
     </div>
   );
 }

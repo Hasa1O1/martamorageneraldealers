@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import EditableCard from "../components/EditableCard";
 import EditModal from "../components/EditModal";
 import AddCardForm from "../components/AddCardForm";
+import ImageUploader from "../components/ImageUploader";
 
 interface GalleryItem {
   id: string;
@@ -33,6 +34,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
     category: "",
     image_url: "",
   });
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchGalleryItems();
@@ -103,14 +105,16 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
     }
   }
 
-  async function deleteGalleryItem(id: string) {
-    if (!confirm("Delete this gallery item?")) return;
+  async function confirmDeleteGalleryItem() {
+    if (!pendingDeleteId) return;
 
     try {
-      await supabase.from("gallery_items").delete().eq("id", id);
+      await supabase.from("gallery_items").delete().eq("id", pendingDeleteId);
       await fetchGalleryItems();
     } catch (error) {
       console.error("Error deleting gallery item:", error);
+    } finally {
+      setPendingDeleteId(null);
     }
   }
 
@@ -290,7 +294,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
                     key={item.id}
                     isAdmin={isAdmin}
                     onEdit={() => openGalleryModal(item)}
-                    onDelete={() => deleteGalleryItem(item.id)}
+                    onDelete={() => setPendingDeleteId(item.id)}
                   >
                     {card}
                   </EditableCard>
@@ -401,8 +405,48 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
               className="w-full rounded-3xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
               style={{ fontFamily: "Calibri, sans-serif" }}
             />
+            <div className="mt-4">
+              <ImageUploader
+                value={draftItem.image_url}
+                onUpload={(url) =>
+                  setDraftItem((prev) => ({ ...prev, image_url: url }))
+                }
+              />
+            </div>
           </div>
         </div>
+      </EditModal>
+
+      <EditModal
+        open={pendingDeleteId !== null}
+        title="Delete gallery item?"
+        onClose={() => setPendingDeleteId(null)}
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => setPendingDeleteId(null)}
+              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => void confirmDeleteGalleryItem()}
+              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+            >
+              Delete
+            </button>
+          </>
+        }
+      >
+        <p
+          className="text-gray-600"
+          style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.5" }}
+        >
+          This will permanently remove this image from the gallery. This action cannot
+          be undone.
+        </p>
       </EditModal>
     </div>
   );

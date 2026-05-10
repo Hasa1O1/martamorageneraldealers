@@ -28,11 +28,8 @@ export default function EditableText({
   const [value, setValue] = useState(defaultValue);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(defaultValue);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-
     async function fetchContent() {
       const { data, error } = await supabase
         .from("site_content")
@@ -48,7 +45,6 @@ export default function EditableText({
         setValue(defaultValue);
         setDraft(defaultValue);
       }
-      setLoading(false);
     }
 
     void fetchContent();

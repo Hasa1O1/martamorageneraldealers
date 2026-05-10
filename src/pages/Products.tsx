@@ -5,6 +5,9 @@ import { useAuth } from "../context/AuthContext";
 import EditableCard from "../components/EditableCard";
 import EditModal from "../components/EditModal";
 import AddCardForm from "../components/AddCardForm";
+import EditableText from "../components/EditableText";
+import ImageUploader from "../components/ImageUploader";
+import type { PublicRoute } from "../appRoutes";
 
 interface Product {
   id: string;
@@ -19,9 +22,13 @@ interface Product {
 
 interface ProductsProps {
   adminMode?: boolean;
+  onNavigate?: (page: PublicRoute) => void;
 }
 
-export default function Products({ adminMode = false }: ProductsProps) {
+export default function Products({
+  adminMode = false,
+  onNavigate,
+}: ProductsProps) {
   const { isAdmin } = useAuth();
   const showAdminControls = isAdmin && adminMode;
   const [products, setProducts] = useState<Product[]>([]);
@@ -38,6 +45,7 @@ export default function Products({ adminMode = false }: ProductsProps) {
     image_url: "",
     features: "",
   });
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -113,14 +121,16 @@ export default function Products({ adminMode = false }: ProductsProps) {
     }
   }
 
-  async function deleteProduct(id: string) {
-    if (!confirm("Delete this product?")) return;
+  async function confirmDeleteProduct() {
+    if (!pendingDeleteId) return;
 
     try {
-      await supabase.from("products").delete().eq("id", id);
+      await supabase.from("products").delete().eq("id", pendingDeleteId);
       await fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
+    } finally {
+      setPendingDeleteId(null);
     }
   }
 
@@ -198,18 +208,24 @@ export default function Products({ adminMode = false }: ProductsProps) {
       >
         <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-blue-900/80"></div>
         <div className="relative z-10 text-center px-4">
-          <h1
+          <EditableText
+            page="products"
+            section="products_hero_title"
+            adminMode={adminMode}
+            defaultValue="Our Products"
+            tag="h1"
             className="text-5xl md:text-6xl font-bold text-white mb-4"
             style={{ fontFamily: "Times New Roman, serif" }}
-          >
-            Our Products
-          </h1>
-          <p
+          />
+          <EditableText
+            page="products"
+            section="products_hero_subtitle"
+            adminMode={adminMode}
+            defaultValue="Premium Herbal Products for Natural Wellness"
+            tag="p"
             className="text-xl text-gray-100"
             style={{ fontFamily: "Calibri, sans-serif" }}
-          >
-            Premium Herbal Products for Natural Wellness
-          </p>
+          />
         </div>
       </section>
 
@@ -348,7 +364,7 @@ export default function Products({ adminMode = false }: ProductsProps) {
                     key={product.id}
                     isAdmin={isAdmin}
                     onEdit={() => openProductModal(product)}
-                    onDelete={() => deleteProduct(product.id)}
+                    onDelete={() => setPendingDeleteId(product.id)}
                   >
                     {card}
                   </EditableCard>
@@ -363,20 +379,27 @@ export default function Products({ adminMode = false }: ProductsProps) {
 
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2
+          <EditableText
+            page="products"
+            section="products_cta_title"
+            adminMode={adminMode}
+            defaultValue="Interested in Our Products?"
+            tag="h2"
             className="text-3xl font-bold mb-6"
             style={{ fontFamily: "Times New Roman, serif", color: "#754C29" }}
-          >
-            Interested in Our Products?
-          </h2>
-          <p
+          />
+          <EditableText
+            page="products"
+            section="products_cta_text"
+            adminMode={adminMode}
+            defaultValue="Contact us to learn more about our premium herbal products and how they can support your wellness journey."
+            tag="p"
             className="text-lg text-gray-600 mb-8"
             style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.5" }}
-          >
-            Contact us to learn more about our premium herbal products and how
-            they can support your wellness journey.
-          </p>
+          />
           <button
+            type="button"
+            onClick={() => onNavigate?.("contact")}
             className="px-8 py-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
             style={{ fontFamily: "Calibri, sans-serif" }}
           >
@@ -489,6 +512,14 @@ export default function Products({ adminMode = false }: ProductsProps) {
               className="w-full rounded-3xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
               style={{ fontFamily: "Calibri, sans-serif" }}
             />
+            <div className="mt-4">
+              <ImageUploader
+                value={draftProduct.image_url}
+                onUpload={(url) =>
+                  setDraftProduct((prev) => ({ ...prev, image_url: url }))
+                }
+              />
+            </div>
           </div>
 
           <div>
@@ -512,6 +543,38 @@ export default function Products({ adminMode = false }: ProductsProps) {
             />
           </div>
         </div>
+      </EditModal>
+
+      <EditModal
+        open={pendingDeleteId !== null}
+        title="Delete product?"
+        onClose={() => setPendingDeleteId(null)}
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => setPendingDeleteId(null)}
+              className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => void confirmDeleteProduct()}
+              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+            >
+              Delete
+            </button>
+          </>
+        }
+      >
+        <p
+          className="text-gray-600"
+          style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.5" }}
+        >
+          This will permanently remove this product from your catalogue. This action
+          cannot be undone.
+        </p>
       </EditModal>
 
       {detailsProduct && isDetailsOpen && (
