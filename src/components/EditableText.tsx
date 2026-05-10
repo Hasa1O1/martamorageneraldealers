@@ -32,6 +32,7 @@ export default function EditableText({
 
   useEffect(() => {
     setLoading(true);
+
     async function fetchContent() {
       const { data, error } = await supabase
         .from("site_content")
@@ -50,7 +51,37 @@ export default function EditableText({
       setLoading(false);
     }
 
-    fetchContent();
+    void fetchContent();
+
+    const channel = supabase.channel(`site-content-${page}-${section}`).on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "site_content",
+        filter: `page=eq.${page}`,
+      },
+      (payload) => {
+        const row =
+          payload.eventType === "DELETE"
+            ? (payload.old as { section?: string; content?: string })
+            : (payload.new as { section?: string; content?: string });
+
+        if (row.section !== section) {
+          return;
+        }
+
+        const nextValue = row.content ?? defaultValue;
+        setValue(nextValue);
+        setDraft(nextValue);
+      },
+    );
+
+    void channel.subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, [page, section, defaultValue]);
 
   async function saveContent() {
