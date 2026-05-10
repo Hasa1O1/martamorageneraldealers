@@ -1,13 +1,17 @@
-import { Phone, Mail, MapPin, Send } from 'lucide-react';
-import { useState } from 'react';
-import EditableText from '../components/EditableText';
+import { Phone, Mail, MapPin, Send } from "lucide-react";
+import { useState } from "react";
+import EditableText from "../components/EditableText";
 
-export default function Contact() {
+interface ContactProps {
+  adminMode?: boolean;
+}
+
+export default function Contact({ adminMode = false }: ContactProps) {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -17,11 +21,13 @@ export default function Contact() {
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);
-      setFormData({ name: '', email: '', phone: '', message: '' });
+      setFormData({ name: "", email: "", phone: "", message: "" });
     }, 3000);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -33,7 +39,8 @@ export default function Contact() {
       <section
         className="relative h-80 flex items-center justify-center bg-cover bg-center"
         style={{
-          backgroundImage: 'url(https://images.pexels.com/photos/4021763/pexels-photo-4021763.jpeg?auto=compress&cs=tinysrgb&w=1920)',
+          backgroundImage:
+            "url(https://images.pexels.com/photos/4021763/pexels-photo-4021763.jpeg?auto=compress&cs=tinysrgb&w=1920)",
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-blue-900/80"></div>
@@ -41,18 +48,20 @@ export default function Contact() {
           <EditableText
             page="contact"
             section="hero_title"
+            adminMode={adminMode}
             defaultValue="Contact Us"
             tag="h1"
             className="text-5xl md:text-6xl font-bold text-white mb-4"
-            style={{ fontFamily: 'Times New Roman, serif' }}
+            style={{ fontFamily: "Times New Roman, serif" }}
           />
           <EditableText
             page="contact"
             section="hero_subtitle"
+            adminMode={adminMode}
             defaultValue="We'd Love to Hear From You"
             tag="p"
             className="text-xl text-gray-100"
-            style={{ fontFamily: 'Calibri, sans-serif' }}
+            style={{ fontFamily: "Calibri, sans-serif" }}
           />
         </div>
       </section>
@@ -63,17 +72,21 @@ export default function Contact() {
             <div>
               <h2
                 className="text-3xl font-bold mb-6"
-                style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
+                style={{
+                  fontFamily: "Times New Roman, serif",
+                  color: "#754C29",
+                }}
               >
                 Get in Touch
               </h2>
               <EditableText
                 page="contact"
                 section="intro_text"
+                adminMode={adminMode}
                 defaultValue="Have questions about our products or services? We're here to help. Reach out to us and we'll respond as soon as possible."
                 tag="p"
                 className="text-lg text-gray-600 mb-8"
-                style={{ fontFamily: 'Calibri, sans-serif', lineHeight: '1.6' }}
+                style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.6" }}
               />
 
               <div className="space-y-6">
@@ -85,18 +98,23 @@ export default function Contact() {
                     <EditableText
                       page="contact"
                       section="phone_label"
+                      adminMode={adminMode}
                       defaultValue="Phone"
                       tag="h3"
                       className="text-lg font-bold mb-1"
-                      style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
+                      style={{
+                        fontFamily: "Times New Roman, serif",
+                        color: "#754C29",
+                      }}
                     />
                     <EditableText
                       page="contact"
                       section="phone_value"
+                      adminMode={adminMode}
                       defaultValue="0772792147"
                       tag="p"
                       className="text-gray-600"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     />
                   </div>
                 </div>
@@ -109,18 +127,23 @@ export default function Contact() {
                     <EditableText
                       page="contact"
                       section="email_label"
+                      adminMode={adminMode}
                       defaultValue="Email"
                       tag="h3"
                       className="text-lg font-bold mb-1"
-                      style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
+                      style={{
+                        fontFamily: "Times New Roman, serif",
+                        color: "#754C29",
+                      }}
                     />
                     <EditableText
                       page="contact"
                       section="email_value"
+                      adminMode={adminMode}
                       defaultValue="monicamutale23@gmail.com"
                       tag="p"
                       className="text-gray-600"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     />
                   </div>
                 </div>
@@ -133,18 +156,23 @@ export default function Contact() {
                     <EditableText
                       page="contact"
                       section="location_label"
+                      adminMode={adminMode}
                       defaultValue="Location"
                       tag="h3"
                       className="text-lg font-bold mb-1"
-                      style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
+                      style={{
+                        fontFamily: "Times New Roman, serif",
+                        color: "#754C29",
+                      }}
                     />
                     <EditableText
                       page="contact"
                       section="location_value"
+                      adminMode={adminMode}
                       defaultValue="Zambia"
                       tag="p"
                       className="text-gray-600"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     />
                   </div>
                 </div>
@@ -154,18 +182,23 @@ export default function Contact() {
                 <EditableText
                   page="contact"
                   section="hours_title"
+                  adminMode={adminMode}
                   defaultValue="Business Hours"
                   tag="h3"
                   className="text-xl font-bold mb-3"
-                  style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
+                  style={{
+                    fontFamily: "Times New Roman, serif",
+                    color: "#754C29",
+                  }}
                 />
                 <EditableText
                   page="contact"
                   section="hours_text"
+                  adminMode={adminMode}
                   defaultValue="Monday - Friday: 8:00 AM - 5:00 PM\nSaturday: 9:00 AM - 2:00 PM\nSunday: Closed"
                   tag="div"
                   className="space-y-2 text-gray-600 whitespace-pre-line"
-                  style={{ fontFamily: 'Calibri, sans-serif' }}
+                  style={{ fontFamily: "Calibri, sans-serif" }}
                 />
               </div>
             </div>
@@ -174,10 +207,14 @@ export default function Contact() {
               <EditableText
                 page="contact"
                 section="form_title"
+                adminMode={adminMode}
                 defaultValue="Send Us a Message"
                 tag="h3"
                 className="text-2xl font-bold mb-6"
-                style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
+                style={{
+                  fontFamily: "Times New Roman, serif",
+                  color: "#754C29",
+                }}
               />
 
               {submitted ? (
@@ -187,13 +224,13 @@ export default function Contact() {
                   </div>
                   <h4
                     className="text-xl font-bold text-green-700 mb-2"
-                    style={{ fontFamily: 'Times New Roman, serif' }}
+                    style={{ fontFamily: "Times New Roman, serif" }}
                   >
                     Message Sent!
                   </h4>
                   <p
                     className="text-gray-600"
-                    style={{ fontFamily: 'Calibri, sans-serif' }}
+                    style={{ fontFamily: "Calibri, sans-serif" }}
                   >
                     Thank you for contacting us. We'll get back to you soon.
                   </p>
@@ -203,7 +240,7 @@ export default function Contact() {
                   <div>
                     <label
                       className="block text-sm font-medium text-gray-700 mb-2"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     >
                       Full Name
                     </label>
@@ -214,14 +251,14 @@ export default function Contact() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     />
                   </div>
 
                   <div>
                     <label
                       className="block text-sm font-medium text-gray-700 mb-2"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     >
                       Email Address
                     </label>
@@ -232,14 +269,14 @@ export default function Contact() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     />
                   </div>
 
                   <div>
                     <label
                       className="block text-sm font-medium text-gray-700 mb-2"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     >
                       Phone Number
                     </label>
@@ -249,14 +286,14 @@ export default function Contact() {
                       value={formData.phone}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     />
                   </div>
 
                   <div>
                     <label
                       className="block text-sm font-medium text-gray-700 mb-2"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     >
                       Message
                     </label>
@@ -267,14 +304,14 @@ export default function Contact() {
                       required
                       rows={5}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition-all resize-none"
-                      style={{ fontFamily: 'Calibri, sans-serif' }}
+                      style={{ fontFamily: "Calibri, sans-serif" }}
                     ></textarea>
                   </div>
 
                   <button
                     type="submit"
                     className="w-full px-6 py-4 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
-                    style={{ fontFamily: 'Calibri, sans-serif' }}
+                    style={{ fontFamily: "Calibri, sans-serif" }}
                   >
                     <Send className="w-5 h-5" />
                     Send Message

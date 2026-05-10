@@ -1,20 +1,30 @@
-import { useEffect, useState } from 'react';
-import { Pencil } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import EditModal from './EditModal';
-import { useAuth } from '../context/AuthContext';
+import { useEffect, useState } from "react";
+import { Pencil } from "lucide-react";
+import { supabase } from "../lib/supabase";
+import EditModal from "./EditModal";
+import { useAuth } from "../context/AuthContext";
 
 interface EditableTextProps {
   page: string;
   section: string;
   defaultValue: string;
+  adminMode?: boolean;
   tag?: keyof JSX.IntrinsicElements;
   className?: string;
   style?: React.CSSProperties;
 }
 
-export default function EditableText({ page, section, defaultValue, tag = 'p', className, style }: EditableTextProps) {
+export default function EditableText({
+  page,
+  section,
+  defaultValue,
+  adminMode = false,
+  tag = "p",
+  className,
+  style,
+}: EditableTextProps) {
   const { isAdmin } = useAuth();
+  const showEditing = isAdmin && adminMode;
   const [value, setValue] = useState(defaultValue);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(defaultValue);
@@ -24,10 +34,10 @@ export default function EditableText({ page, section, defaultValue, tag = 'p', c
     setLoading(true);
     async function fetchContent() {
       const { data, error } = await supabase
-        .from('site_content')
-        .select('content')
-        .eq('page', page)
-        .eq('section', section)
+        .from("site_content")
+        .select("content")
+        .eq("page", page)
+        .eq("section", section)
         .maybeSingle();
 
       if (!error && data?.content) {
@@ -50,17 +60,21 @@ export default function EditableText({ page, section, defaultValue, tag = 'p', c
       content: draft,
     };
 
-    await supabase.from('site_content').upsert(payload, { onConflict: ['page', 'section'] });
+    await supabase
+      .from("site_content")
+      .upsert(payload, { onConflict: "page,section" });
     setValue(draft);
     setEditing(false);
   }
 
-  const Tag = tag as any;
+  const Tag = tag;
 
   return (
     <div className="relative" style={{ minWidth: 0 }}>
-      <Tag className={className} style={style}>{value}</Tag>
-      {isAdmin && (
+      <Tag className={className} style={style}>
+        {value}
+      </Tag>
+      {showEditing && (
         <button
           type="button"
           onClick={() => setEditing(true)}
@@ -73,7 +87,7 @@ export default function EditableText({ page, section, defaultValue, tag = 'p', c
 
       <EditModal
         open={editing}
-        title={`Edit ${section.replace(/_/g, ' ')}`}
+        title={`Edit ${section.replace(/_/g, " ")}`}
         onClose={() => {
           setEditing(false);
           setDraft(value);
@@ -105,7 +119,7 @@ export default function EditableText({ page, section, defaultValue, tag = 'p', c
           onChange={(event) => setDraft(event.target.value)}
           rows={8}
           className="w-full resize-none rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100"
-          style={{ fontFamily: 'Calibri, sans-serif' }}
+          style={{ fontFamily: "Calibri, sans-serif" }}
         />
       </EditModal>
     </div>

@@ -1,13 +1,18 @@
-import { Target, Eye, Leaf } from 'lucide-react';
-import EditableText from '../components/EditableText';
+import { Target, Eye, Leaf } from "lucide-react";
+import EditableText from "../components/EditableText";
 
-export default function About() {
+interface AboutProps {
+  adminMode?: boolean;
+}
+
+export default function About({ adminMode = false }: AboutProps) {
   return (
     <div className="min-h-screen bg-white">
       <section
         className="relative h-96 flex items-center justify-center bg-cover bg-center"
         style={{
-          backgroundImage: 'url(https://images.pexels.com/photos/4021521/pexels-photo-4021521.jpeg?auto=compress&cs=tinysrgb&w=1920)',
+          backgroundImage:
+            "url(https://images.pexels.com/photos/4021521/pexels-photo-4021521.jpeg?auto=compress&cs=tinysrgb&w=1920)",
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-green-900/80 to-green-800/70"></div>
@@ -15,18 +20,20 @@ export default function About() {
           <EditableText
             page="about"
             section="hero_title"
+            adminMode={adminMode}
             defaultValue="About Us"
             tag="h1"
             className="text-5xl md:text-6xl font-bold text-white mb-4"
-            style={{ fontFamily: 'Times New Roman, serif' }}
+            style={{ fontFamily: "Times New Roman, serif" }}
           />
           <EditableText
             page="about"
             section="hero_subtitle"
+            adminMode={adminMode}
             defaultValue="Your Trusted Partner in Natural Wellness"
             tag="p"
             className="text-xl text-gray-100"
-            style={{ fontFamily: 'Calibri, sans-serif' }}
+            style={{ fontFamily: "Calibri, sans-serif" }}
           />
         </div>
       </section>
@@ -38,34 +45,41 @@ export default function About() {
               <EditableText
                 page="about"
                 section="who_we_are_title"
+                adminMode={adminMode}
                 defaultValue="Who We Are"
                 tag="h2"
                 className="text-4xl font-bold mb-6"
-                style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
+                style={{
+                  fontFamily: "Times New Roman, serif",
+                  color: "#754C29",
+                }}
               />
               <EditableText
                 page="about"
                 section="who_we_are_text_1"
+                adminMode={adminMode}
                 defaultValue="Martamora General Dealers is a trusted provider of premium herbal products and supplements, dedicated to promoting health and harmony through the power of authentic herbs."
                 tag="p"
                 className="text-lg text-gray-700 mb-4"
-                style={{ fontFamily: 'Calibri, sans-serif', lineHeight: '1.6' }}
+                style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.6" }}
               />
               <EditableText
                 page="about"
                 section="who_we_are_text_2"
+                adminMode={adminMode}
                 defaultValue="We specialize in carefully sourced, high-quality herbal products that combine traditional knowledge with modern reliability. Our commitment is to provide our community with natural solutions for holistic well-being."
                 tag="p"
                 className="text-lg text-gray-700 mb-4"
-                style={{ fontFamily: 'Calibri, sans-serif', lineHeight: '1.6' }}
+                style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.6" }}
               />
               <EditableText
                 page="about"
                 section="who_we_are_text_3"
+                adminMode={adminMode}
                 defaultValue="With a deep respect for nature and a dedication to quality, we ensure every product meets the highest standards of purity and effectiveness."
                 tag="p"
                 className="text-lg text-gray-700"
-                style={{ fontFamily: 'Calibri, sans-serif', lineHeight: '1.6' }}
+                style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.6" }}
               />
             </div>
             <div className="rounded-lg overflow-hidden shadow-xl">
@@ -86,19 +100,24 @@ export default function About() {
                 <EditableText
                   page="about"
                   section="vision_title"
+                  adminMode={adminMode}
                   defaultValue="Our Vision"
                   tag="h3"
                   className="text-2xl font-bold"
-                  style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
+                  style={{
+                    fontFamily: "Times New Roman, serif",
+                    color: "#754C29",
+                  }}
                 />
               </div>
               <EditableText
                 page="about"
                 section="vision_text"
+                adminMode={adminMode}
                 defaultValue="To become a trusted leader in natural wellness, promoting health and harmony through the power of authentic herbs."
                 tag="p"
                 className="text-gray-700"
-                style={{ fontFamily: 'Calibri, sans-serif', lineHeight: '1.6' }}
+                style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.6" }}
               />
             </div>
 
@@ -110,19 +129,24 @@ export default function About() {
                 <EditableText
                   page="about"
                   section="mission_title"
+                  adminMode={adminMode}
                   defaultValue="Our Mission"
                   tag="h3"
                   className="text-2xl font-bold"
-                  style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}
+                  style={{
+                    fontFamily: "Times New Roman, serif",
+                    color: "#754C29",
+                  }}
                 />
               </div>
               <EditableText
                 page="about"
                 section="mission_text"
+                adminMode={adminMode}
                 defaultValue="To provide our community with the highest quality, carefully sourced herbal products, leveraging traditional knowledge and reliable service to support holistic well-being."
                 tag="p"
                 className="text-gray-700"
-                style={{ fontFamily: 'Calibri, sans-serif', lineHeight: '1.6' }}
+                style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.6" }}
               />
             </div>
           </div>
@@ -132,18 +156,20 @@ export default function About() {
             <EditableText
               page="about"
               section="commitment_title"
+              adminMode={adminMode}
               defaultValue="Our Commitment to Quality"
               tag="h2"
               className="text-3xl font-bold mb-4"
-              style={{ fontFamily: 'Times New Roman, serif' }}
+              style={{ fontFamily: "Times New Roman, serif" }}
             />
             <EditableText
               page="about"
               section="commitment_text"
+              adminMode={adminMode}
               defaultValue="Every product we offer undergoes rigorous quality checks and sourcing standards. We believe in transparency, authenticity, and the transformative power of nature. Our team is dedicated to bringing you only the finest herbal solutions, backed by traditional wisdom and modern science."
               tag="p"
               className="text-lg max-w-3xl mx-auto"
-              style={{ fontFamily: 'Calibri, sans-serif', lineHeight: '1.6' }}
+              style={{ fontFamily: "Calibri, sans-serif", lineHeight: "1.6" }}
             />
           </div>
         </div>
