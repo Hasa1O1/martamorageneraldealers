@@ -49,6 +49,7 @@ export default function Products({
   });
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const heroBackgroundImage = useSiteContentField(
     "products",
     "products_hero_bg",
@@ -108,33 +109,41 @@ export default function Products({
 
     try {
       setSaveError("");
-      const { data, error } = await supabase
+      const updatedProduct: Product = {
+        ...editingProduct,
+        name: draftProduct.name.trim(),
+        description: draftProduct.description.trim(),
+        category: draftProduct.category.trim() || "General",
+        image_url: draftProduct.image_url.trim(),
+        features: draftProduct.features
+          .split("\n")
+          .map((item) => item.trim())
+          .filter(Boolean),
+        display_order: editingProduct.display_order || 0,
+      };
+      const { error } = await supabase
         .from("products")
         .update({
-          name: draftProduct.name.trim(),
-          description: draftProduct.description.trim(),
-          category: draftProduct.category.trim() || "General",
-          image_url: draftProduct.image_url.trim(),
-          features: draftProduct.features
-            .split("\n")
-            .map((item) => item.trim())
-            .filter(Boolean),
-          display_order: editingProduct.display_order || 0,
+          name: updatedProduct.name,
+          description: updatedProduct.description,
+          category: updatedProduct.category,
+          image_url: updatedProduct.image_url,
+          features: updatedProduct.features,
+          display_order: updatedProduct.display_order,
         })
-        .eq("id", editingProduct.id)
-        .select("id")
-        .maybeSingle();
+        .eq("id", editingProduct.id);
 
       if (error) {
         throw error;
       }
-      if (!data) {
-        throw new Error(
-          "No row was updated. Check RLS policies for UPDATE/SELECT on products.",
-        );
-      }
+      setProducts((currentProducts) =>
+        currentProducts.map((product) =>
+          product.id === editingProduct.id ? updatedProduct : product,
+        ),
+      );
       await fetchProducts();
       setIsEditOpen(false);
+      setEditingProduct(null);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unknown save error.";
@@ -147,6 +156,7 @@ export default function Products({
     if (!pendingDeleteId) return;
 
     try {
+      setDeleting(true);
       const { error } = await supabase
         .from("products")
         .delete()
@@ -154,6 +164,9 @@ export default function Products({
       if (error) {
         throw error;
       }
+      setProducts((currentProducts) =>
+        currentProducts.filter((product) => product.id !== pendingDeleteId),
+      );
       await fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
@@ -163,6 +176,7 @@ export default function Products({
         }`,
       );
     } finally {
+      setDeleting(false);
       setPendingDeleteId(null);
     }
   }
@@ -613,9 +627,10 @@ export default function Products({
             <button
               type="button"
               onClick={() => void confirmDeleteProduct()}
-              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+              disabled={deleting}
+              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:bg-red-300"
             >
-              Delete
+              {deleting ? "Deleting..." : "Delete"}
             </button>
           </>
         }
