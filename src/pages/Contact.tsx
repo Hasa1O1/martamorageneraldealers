@@ -2,6 +2,7 @@ import { Phone, Mail, MapPin, Send } from "lucide-react";
 import { useState } from "react";
 import EditableText from "../components/EditableText";
 import EditModal from "../components/EditModal";
+import EditableBackgroundImage from "../components/EditableBackgroundImage";
 import { useSiteContentField } from "../hooks/useSiteContentField";
 
 interface ContactProps {
@@ -36,6 +37,11 @@ export default function Contact({ adminMode = false }: ContactProps) {
     "contact",
     "email_value",
     "monicamutale23@gmail.com",
+  );
+  const heroBackgroundImage = useSiteContentField(
+    "contact",
+    "contact_hero_bg",
+    "https://images.pexels.com/photos/4021763/pexels-photo-4021763.jpeg?auto=compress&cs=tinysrgb&w=1920",
   );
 
   const [formData, setFormData] = useState({
@@ -95,10 +101,15 @@ export default function Contact({ adminMode = false }: ContactProps) {
       <section
         className="relative h-80 flex items-center justify-center bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url(https://images.pexels.com/photos/4021763/pexels-photo-4021763.jpeg?auto=compress&cs=tinysrgb&w=1920)",
+          backgroundImage: `url(${heroBackgroundImage})`,
         }}
       >
+        <EditableBackgroundImage
+          page="contact"
+          section="contact_hero_bg"
+          adminMode={adminMode}
+          currentValue={heroBackgroundImage}
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-blue-900/80"></div>
         <div className="relative z-10 text-center px-4">
           <h1

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Leaf, Award, Users, Heart } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import EditableText from "../components/EditableText";
+import EditableBackgroundImage from "../components/EditableBackgroundImage";
+import { useSiteContentField } from "../hooks/useSiteContentField";
 import type { PublicRoute } from "../appRoutes";
 
 interface FeatureCard {
@@ -42,6 +44,16 @@ export default function Home({ adminMode = false, onNavigate }: HomeProps) {
   const [featureCards, setFeatureCards] =
     useState<FeatureCard[]>(defaultFeatureCards);
   const [loadingFeatures, setLoadingFeatures] = useState(true);
+  const heroBackgroundImage = useSiteContentField(
+    "home",
+    "home_hero_bg",
+    "https://images.pexels.com/photos/4021779/pexels-photo-4021779.jpeg?auto=compress&cs=tinysrgb&w=1920",
+  );
+  const missionBackgroundImage = useSiteContentField(
+    "home",
+    "home_mission_bg",
+    "https://images.pexels.com/photos/4021521/pexels-photo-4021521.jpeg?auto=compress&cs=tinysrgb&w=1920",
+  );
 
   useEffect(() => {
     fetchFeatureCards();
@@ -100,10 +112,15 @@ export default function Home({ adminMode = false, onNavigate }: HomeProps) {
       <section
         className="relative h-screen flex items-center justify-center bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url(https://images.pexels.com/photos/4021779/pexels-photo-4021779.jpeg?auto=compress&cs=tinysrgb&w=1920)",
+          backgroundImage: `url(${heroBackgroundImage})`,
         }}
       >
+        <EditableBackgroundImage
+          page="home"
+          section="home_hero_bg"
+          adminMode={adminMode}
+          currentValue={heroBackgroundImage}
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/50"></div>
         <div className="relative z-10 max-w-4xl mx-auto text-center px-4">
           <h1
@@ -220,10 +237,15 @@ export default function Home({ adminMode = false, onNavigate }: HomeProps) {
       <section
         className="py-20 bg-cover bg-center relative"
         style={{
-          backgroundImage:
-            "url(https://images.pexels.com/photos/4021521/pexels-photo-4021521.jpeg?auto=compress&cs=tinysrgb&w=1920)",
+          backgroundImage: `url(${missionBackgroundImage})`,
         }}
       >
+        <EditableBackgroundImage
+          page="home"
+          section="home_mission_bg"
+          adminMode={adminMode}
+          currentValue={missionBackgroundImage}
+        />
         <div className="absolute inset-0 bg-green-900/80"></div>
         <div className="relative z-10 max-w-4xl mx-auto text-center px-4">
           <h2

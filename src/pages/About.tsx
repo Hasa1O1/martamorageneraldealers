@@ -1,15 +1,32 @@
 import { Target, Eye, Leaf } from "lucide-react";
+import EditableBackgroundImage from "../components/EditableBackgroundImage";
+import { useSiteContentField } from "../hooks/useSiteContentField";
 
-export default function About() {
+interface AboutProps {
+  adminMode?: boolean;
+}
+
+export default function About({ adminMode = false }: AboutProps) {
+  const heroBackgroundImage = useSiteContentField(
+    "about",
+    "about_hero_bg",
+    "https://images.pexels.com/photos/4021521/pexels-photo-4021521.jpeg?auto=compress&cs=tinysrgb&w=1920",
+  );
+
   return (
     <div className="min-h-screen bg-white">
       <section
         className="relative h-96 flex items-center justify-center bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url(https://images.pexels.com/photos/4021521/pexels-photo-4021521.jpeg?auto=compress&cs=tinysrgb&w=1920)",
+          backgroundImage: `url(${heroBackgroundImage})`,
         }}
       >
+        <EditableBackgroundImage
+          page="about"
+          section="about_hero_bg"
+          adminMode={adminMode}
+          currentValue={heroBackgroundImage}
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-green-900/80 to-green-800/70"></div>
         <div className="relative z-10 text-center px-4">
           <h1

@@ -7,6 +7,8 @@ import EditModal from "../components/EditModal";
 import AddCardForm from "../components/AddCardForm";
 import EditableText from "../components/EditableText";
 import ImageUploader from "../components/ImageUploader";
+import EditableBackgroundImage from "../components/EditableBackgroundImage";
+import { useSiteContentField } from "../hooks/useSiteContentField";
 import type { PublicRoute } from "../appRoutes";
 
 interface Product {
@@ -47,6 +49,11 @@ export default function Products({
   });
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState("");
+  const heroBackgroundImage = useSiteContentField(
+    "products",
+    "products_hero_bg",
+    "https://images.pexels.com/photos/4021779/pexels-photo-4021779.jpeg?auto=compress&cs=tinysrgb&w=1920",
+  );
 
   useEffect(() => {
     fetchProducts();
@@ -231,10 +238,15 @@ export default function Products({
       <section
         className="relative h-80 flex items-center justify-center bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url(https://images.pexels.com/photos/4021779/pexels-photo-4021779.jpeg?auto=compress&cs=tinysrgb&w=1920)",
+          backgroundImage: `url(${heroBackgroundImage})`,
         }}
       >
+        <EditableBackgroundImage
+          page="products"
+          section="products_hero_bg"
+          adminMode={adminMode}
+          currentValue={heroBackgroundImage}
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-green-900/90 to-blue-900/80"></div>
         <div className="relative z-10 text-center px-4">
           <EditableText

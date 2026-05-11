@@ -53,7 +53,7 @@ function App() {
       case 'home':
         return <Home adminMode={isAdmin} onNavigate={goToPage} />;
       case 'about':
-        return <About />;
+        return <About adminMode={isAdmin} />;
       case 'products':
         return <Products adminMode={isAdmin} onNavigate={goToPage} />;
       case 'gallery':

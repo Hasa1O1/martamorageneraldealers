@@ -6,6 +6,8 @@ import EditableCard from "../components/EditableCard";
 import EditModal from "../components/EditModal";
 import AddCardForm from "../components/AddCardForm";
 import ImageUploader from "../components/ImageUploader";
+import EditableBackgroundImage from "../components/EditableBackgroundImage";
+import { useSiteContentField } from "../hooks/useSiteContentField";
 
 interface GalleryItem {
   id: string;
@@ -36,6 +38,11 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
   });
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState("");
+  const heroBackgroundImage = useSiteContentField(
+    "gallery",
+    "gallery_hero_bg",
+    "https://images.pexels.com/photos/4021521/pexels-photo-4021521.jpeg?auto=compress&cs=tinysrgb&w=1920",
+  );
 
   useEffect(() => {
     fetchGalleryItems();
@@ -215,10 +222,15 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
       <section
         className="relative h-80 flex items-center justify-center bg-cover bg-center"
         style={{
-          backgroundImage:
-            "url(https://images.pexels.com/photos/4021521/pexels-photo-4021521.jpeg?auto=compress&cs=tinysrgb&w=1920)",
+          backgroundImage: `url(${heroBackgroundImage})`,
         }}
       >
+        <EditableBackgroundImage
+          page="gallery"
+          section="gallery_hero_bg"
+          adminMode={adminMode}
+          currentValue={heroBackgroundImage}
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-green-900/80"></div>
         <div className="relative z-10 text-center px-4">
           <h1
