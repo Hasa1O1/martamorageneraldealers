@@ -46,6 +46,7 @@ export default function Products({
     features: "",
   });
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     fetchProducts();
@@ -99,9 +100,10 @@ export default function Products({
     if (!editingProduct) return;
 
     try {
-      await supabase.from("products").upsert(
-        {
-          id: editingProduct.id,
+      setSaveError("");
+      const { data, error } = await supabase
+        .from("products")
+        .update({
           name: draftProduct.name.trim(),
           description: draftProduct.description.trim(),
           category: draftProduct.category.trim() || "General",
@@ -111,12 +113,25 @@ export default function Products({
             .map((item) => item.trim())
             .filter(Boolean),
           display_order: editingProduct.display_order || 0,
-        },
-        { onConflict: "id" },
-      );
+        })
+        .eq("id", editingProduct.id)
+        .select("id")
+        .maybeSingle();
+
+      if (error) {
+        throw error;
+      }
+      if (!data) {
+        throw new Error(
+          "No row was updated. Check RLS policies for UPDATE/SELECT on products.",
+        );
+      }
       await fetchProducts();
       setIsEditOpen(false);
     } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown save error.";
+      setSaveError(message);
       console.error("Error saving product:", error);
     }
   }
@@ -125,10 +140,21 @@ export default function Products({
     if (!pendingDeleteId) return;
 
     try {
-      await supabase.from("products").delete().eq("id", pendingDeleteId);
+      const { error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", pendingDeleteId);
+      if (error) {
+        throw error;
+      }
       await fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
+      window.alert(
+        `Unable to delete product. ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      );
     } finally {
       setPendingDeleteId(null);
     }
@@ -194,8 +220,11 @@ export default function Products({
     },
   ];
 
-  const displayProducts =
-    products.length > 0 ? filteredProducts : sampleProducts;
+  const displayProducts = showAdminControls
+    ? filteredProducts
+    : products.length > 0
+      ? filteredProducts
+      : sampleProducts;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -415,7 +444,10 @@ export default function Products({
       <EditModal
         open={isEditOpen}
         title="Edit Product"
-        onClose={() => setIsEditOpen(false)}
+        onClose={() => {
+          setIsEditOpen(false);
+          setSaveError("");
+        }}
         actions={
           <>
             <button
@@ -436,6 +468,14 @@ export default function Products({
         }
       >
         <div className="space-y-5">
+          {saveError && (
+            <p
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+              style={{ fontFamily: "Calibri, sans-serif" }}
+            >
+              {saveError}
+            </p>
+          )}
           <div>
             <label
               className="block text-sm font-medium text-gray-700 mb-2"

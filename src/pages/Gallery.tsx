@@ -35,6 +35,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
     image_url: "",
   });
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     fetchGalleryItems();
@@ -87,20 +88,33 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
     if (!editingItem) return;
 
     try {
-      await supabase.from("gallery_items").upsert(
-        {
-          id: editingItem.id,
+      setSaveError("");
+      const { data, error } = await supabase
+        .from("gallery_items")
+        .update({
           title: draftItem.title.trim(),
           description: draftItem.description.trim(),
           category: draftItem.category.trim() || "General",
           image_url: draftItem.image_url.trim(),
           display_order: editingItem.display_order || 0,
-        },
-        { onConflict: "id" },
-      );
+        })
+        .eq("id", editingItem.id)
+        .select("id")
+        .maybeSingle();
+      if (error) {
+        throw error;
+      }
+      if (!data) {
+        throw new Error(
+          "No row was updated. Check RLS policies for UPDATE/SELECT on gallery_items.",
+        );
+      }
       await fetchGalleryItems();
       setIsEditOpen(false);
     } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown save error.";
+      setSaveError(message);
       console.error("Error saving gallery item:", error);
     }
   }
@@ -109,10 +123,21 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
     if (!pendingDeleteId) return;
 
     try {
-      await supabase.from("gallery_items").delete().eq("id", pendingDeleteId);
+      const { error } = await supabase
+        .from("gallery_items")
+        .delete()
+        .eq("id", pendingDeleteId);
+      if (error) {
+        throw error;
+      }
       await fetchGalleryItems();
     } catch (error) {
       console.error("Error deleting gallery item:", error);
+      window.alert(
+        `Unable to delete gallery item. ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`,
+      );
     } finally {
       setPendingDeleteId(null);
     }
@@ -314,7 +339,10 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
       <EditModal
         open={isEditOpen}
         title="Edit Gallery Item"
-        onClose={() => setIsEditOpen(false)}
+        onClose={() => {
+          setIsEditOpen(false);
+          setSaveError("");
+        }}
         actions={
           <>
             <button
@@ -335,6 +363,14 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
         }
       >
         <div className="space-y-5">
+          {saveError && (
+            <p
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
+              style={{ fontFamily: "Calibri, sans-serif" }}
+            >
+              {saveError}
+            </p>
+          )}
           <div>
             <label
               className="block text-sm font-medium text-gray-700 mb-2"

@@ -87,9 +87,14 @@ export default function EditableText({
       content: draft,
     };
 
-    await supabase
+    const { error } = await supabase
       .from("site_content")
       .upsert(payload, { onConflict: "page,section" });
+    if (error) {
+      console.error("Error saving site content:", error);
+      window.alert(`Unable to save this content. ${error.message}`);
+      return;
+    }
     setValue(draft);
     setEditing(false);
   }
