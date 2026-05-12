@@ -44,7 +44,8 @@ export default function ImageUploader({ value, onUpload }: ImageUploaderProps) {
       setPreview(data.publicUrl);
       onUpload(data.publicUrl);
     } catch (uploadError) {
-      setError(String(uploadError));
+      const message = uploadError instanceof Error ? uploadError.message : String(uploadError);
+      setError(`Image upload failed: ${message}`);
     } finally {
       setUploading(false);
     }
