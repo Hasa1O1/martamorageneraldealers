@@ -54,7 +54,7 @@ export default function AddCardForm({ mode, onSaved }: AddCardFormProps) {
           throw insertError;
         }
       } else if (mode === 'products') {
-        const { data, error: insertError } = await supabase
+        const { error: insertError } = await supabase
           .from('products')
           .insert({
             name: name.trim(),
@@ -64,18 +64,13 @@ export default function AddCardForm({ mode, onSaved }: AddCardFormProps) {
             features: features.split('\n').map((item) => item.trim()).filter(Boolean),
             is_featured: false,
             display_order: 0,
-          })
-          .select('id')
-          .maybeSingle();
+          });
 
         if (insertError) {
           throw insertError;
         }
-        if (!data?.id) {
-          throw new Error('Product was not created. Please check your Supabase RLS policies.');
-        }
       } else {
-        const { data, error: insertError } = await supabase
+        const { error: insertError } = await supabase
           .from('gallery_items')
           .insert({
             title: name.trim(),
@@ -83,15 +78,10 @@ export default function AddCardForm({ mode, onSaved }: AddCardFormProps) {
             category: category.trim() || 'General',
             image_url: imageUrl.trim(),
             display_order: 0,
-          })
-          .select('id')
-          .maybeSingle();
+          });
 
         if (insertError) {
           throw insertError;
-        }
-        if (!data?.id) {
-          throw new Error('Gallery item was not created. Please check your Supabase RLS policies.');
         }
       }
 

@@ -38,6 +38,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
   });
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const heroBackgroundImage = useSiteContentField(
     "gallery",
     "gallery_hero_bg",
@@ -96,28 +97,35 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
 
     try {
       setSaveError("");
-      const { data, error } = await supabase
+      const updatedItem: GalleryItem = {
+        ...editingItem,
+        title: draftItem.title.trim(),
+        description: draftItem.description.trim(),
+        category: draftItem.category.trim() || "General",
+        image_url: draftItem.image_url.trim(),
+        display_order: editingItem.display_order || 0,
+      };
+      const { error } = await supabase
         .from("gallery_items")
         .update({
-          title: draftItem.title.trim(),
-          description: draftItem.description.trim(),
-          category: draftItem.category.trim() || "General",
-          image_url: draftItem.image_url.trim(),
-          display_order: editingItem.display_order || 0,
+          title: updatedItem.title,
+          description: updatedItem.description,
+          category: updatedItem.category,
+          image_url: updatedItem.image_url,
+          display_order: updatedItem.display_order,
         })
-        .eq("id", editingItem.id)
-        .select("id")
-        .maybeSingle();
+        .eq("id", editingItem.id);
       if (error) {
         throw error;
       }
-      if (!data) {
-        throw new Error(
-          "No row was updated. Check RLS policies for UPDATE/SELECT on gallery_items.",
-        );
-      }
+      setItems((currentItems) =>
+        currentItems.map((item) =>
+          item.id === editingItem.id ? updatedItem : item,
+        ),
+      );
       await fetchGalleryItems();
       setIsEditOpen(false);
+      setEditingItem(null);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unknown save error.";
@@ -130,6 +138,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
     if (!pendingDeleteId) return;
 
     try {
+      setDeleting(true);
       const { error } = await supabase
         .from("gallery_items")
         .delete()
@@ -137,6 +146,9 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
       if (error) {
         throw error;
       }
+      setItems((currentItems) =>
+        currentItems.filter((item) => item.id !== pendingDeleteId),
+      );
       await fetchGalleryItems();
     } catch (error) {
       console.error("Error deleting gallery item:", error);
@@ -146,6 +158,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
         }`,
       );
     } finally {
+      setDeleting(false);
       setPendingDeleteId(null);
     }
   }
@@ -207,7 +220,11 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
     },
   ];
 
-  const displayItems = items.length > 0 ? items : sampleItems;
+  const displayItems = showAdminControls
+    ? items
+    : items.length > 0
+      ? items
+      : sampleItems;
   const categories = [
     "All",
     ...Array.from(new Set(displayItems.map((i) => i.category))),
@@ -481,9 +498,10 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
             <button
               type="button"
               onClick={() => void confirmDeleteGalleryItem()}
-              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+              disabled={deleting}
+              className="rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 disabled:bg-red-300"
             >
-              Delete
+              {deleting ? "Deleting..." : "Delete"}
             </button>
           </>
         }

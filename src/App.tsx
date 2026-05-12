@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { LogOut } from 'lucide-react';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -13,7 +14,7 @@ import { appRoutes, type AppRoute, type PublicRoute } from './appRoutes';
 const pages = appRoutes;
 
 function App() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, signOut } = useAuth();
   const [currentPage, setCurrentPage] = useState<AppRoute>('home');
 
   const goToPage = (page: PublicRoute) => setCurrentPage(page);
@@ -71,6 +72,23 @@ function App() {
     <div className="min-h-screen bg-white">
       <Navigation currentPage={currentPage} onNavigate={setCurrentPage} />
       <main className="pt-20">{renderPage()}</main>
+      {isAdmin && (
+        <section className="bg-gray-50 px-4 py-10">
+          <div className="mx-auto flex max-w-7xl justify-center">
+            <button
+              type="button"
+              onClick={async () => {
+                await signOut();
+              }}
+              className="inline-flex items-center gap-2 rounded-full bg-green-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-green-600"
+              style={{ fontFamily: 'Calibri, sans-serif' }}
+            >
+              <LogOut className="h-5 w-5" />
+              Sign Out
+            </button>
+          </div>
+        </section>
+      )}
       <Footer onNavigate={goToPage} />
     </div>
   );
