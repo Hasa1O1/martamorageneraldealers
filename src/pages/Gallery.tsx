@@ -163,68 +163,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
     }
   }
 
-  const sampleItems = [
-    {
-      id: "1",
-      title: "Herbal Collection",
-      description: "Our premium selection of dried herbs",
-      category: "Products",
-      image_url:
-        "https://images.pexels.com/photos/4021521/pexels-photo-4021521.jpeg?auto=compress&cs=tinysrgb&w=800",
-      display_order: 0,
-    },
-    {
-      id: "2",
-      title: "Essential Oils",
-      description: "Pure and therapeutic essential oils",
-      category: "Products",
-      image_url:
-        "https://images.pexels.com/photos/4021775/pexels-photo-4021775.jpeg?auto=compress&cs=tinysrgb&w=800",
-      display_order: 0,
-    },
-    {
-      id: "3",
-      title: "Product Packaging",
-      description: "Eco-friendly and sustainable packaging",
-      category: "Packaging",
-      image_url:
-        "https://images.pexels.com/photos/4021763/pexels-photo-4021763.jpeg?auto=compress&cs=tinysrgb&w=800",
-      display_order: 0,
-    },
-    {
-      id: "4",
-      title: "Herbal Teas",
-      description: "Artisanal tea blends",
-      category: "Products",
-      image_url:
-        "https://images.pexels.com/photos/1793035/pexels-photo-1793035.jpeg?auto=compress&cs=tinysrgb&w=800",
-      display_order: 0,
-    },
-    {
-      id: "5",
-      title: "Natural Ingredients",
-      description: "Sourced from trusted suppliers",
-      category: "Sourcing",
-      image_url:
-        "https://images.pexels.com/photos/4021779/pexels-photo-4021779.jpeg?auto=compress&cs=tinysrgb&w=800",
-      display_order: 0,
-    },
-    {
-      id: "6",
-      title: "Quality Control",
-      description: "Rigorous testing procedures",
-      category: "Process",
-      image_url:
-        "https://images.pexels.com/photos/6348106/pexels-photo-6348106.jpeg?auto=compress&cs=tinysrgb&w=800",
-      display_order: 0,
-    },
-  ];
-
-  const displayItems = showAdminControls
-    ? items
-    : items.length > 0
-      ? items
-      : sampleItems;
+  const displayItems = items;
   const categories = [
     "All",
     ...Array.from(new Set(displayItems.map((i) => i.category))),

@@ -9,7 +9,7 @@ type Mode = 'products' | 'gallery_items' | 'home_features';
 
 interface AddCardFormProps {
   mode: Mode;
-  onSaved: () => void;
+  onSaved: () => void | Promise<void>;
 }
 
 export default function AddCardForm({ mode, onSaved }: AddCardFormProps) {
@@ -91,7 +91,7 @@ export default function AddCardForm({ mode, onSaved }: AddCardFormProps) {
       setImageUrl('');
       setFeatures('');
       setOpen(false);
-      onSaved();
+      await onSaved();
     } catch (submitError) {
       const message =
         submitError instanceof Error

@@ -190,62 +190,7 @@ export default function Products({
       ? products
       : products.filter((p) => p.category === selectedCategory);
 
-  const sampleProducts = [
-    {
-      id: "1",
-      name: "Herbal Tea Blend",
-      category: "Teas",
-      description:
-        "A soothing blend of premium herbs for relaxation and wellness.",
-      image_url:
-        "https://images.pexels.com/photos/1793035/pexels-photo-1793035.jpeg?auto=compress&cs=tinysrgb&w=800",
-      features: ["100% Natural", "No Additives", "Traditional Recipe"],
-      is_featured: true,
-      display_order: 0,
-    },
-    {
-      id: "2",
-      name: "Herbal Supplements",
-      category: "Supplements",
-      description:
-        "Premium quality herbal supplements for daily wellness support.",
-      image_url:
-        "https://images.pexels.com/photos/4021763/pexels-photo-4021763.jpeg?auto=compress&cs=tinysrgb&w=800",
-      features: ["Lab Tested", "Pure Ingredients", "Effective Formula"],
-      is_featured: true,
-      display_order: 0,
-    },
-    {
-      id: "3",
-      name: "Essential Oils",
-      category: "Oils",
-      description:
-        "Pure essential oils extracted from the finest botanical sources.",
-      image_url:
-        "https://images.pexels.com/photos/4021775/pexels-photo-4021775.jpeg?auto=compress&cs=tinysrgb&w=800",
-      features: ["Cold Pressed", "Organic", "Therapeutic Grade"],
-      is_featured: true,
-      display_order: 0,
-    },
-    {
-      id: "4",
-      name: "Herbal Powders",
-      category: "Powders",
-      description:
-        "Finely ground herbal powders for versatile wellness applications.",
-      image_url:
-        "https://images.pexels.com/photos/4021779/pexels-photo-4021779.jpeg?auto=compress&cs=tinysrgb&w=800",
-      features: ["Fresh Ground", "No Fillers", "High Potency"],
-      is_featured: false,
-      display_order: 0,
-    },
-  ];
-
-  const displayProducts = showAdminControls
-    ? filteredProducts
-    : products.length > 0
-      ? filteredProducts
-      : sampleProducts;
+  const displayProducts = filteredProducts;
 
   return (
     <div className="min-h-screen bg-gray-50">
