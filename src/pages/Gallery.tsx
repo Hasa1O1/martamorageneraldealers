@@ -105,7 +105,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
         image_url: draftItem.image_url.trim(),
         display_order: editingItem.display_order || 0,
       };
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from("gallery_items")
         .update({
           title: updatedItem.title,
@@ -113,10 +113,13 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
           category: updatedItem.category,
           image_url: updatedItem.image_url,
           display_order: updatedItem.display_order,
-        })
+        }, { count: "exact" })
         .eq("id", editingItem.id);
       if (error) {
         throw error;
+      }
+      if (count !== null && count < 1) {
+        throw new Error("No gallery item was updated. Please refresh and confirm this gallery item still exists.");
       }
       setItems((currentItems) =>
         currentItems.map((item) =>
@@ -139,12 +142,15 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
 
     try {
       setDeleting(true);
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from("gallery_items")
-        .delete()
+        .delete({ count: "exact" })
         .eq("id", pendingDeleteId);
       if (error) {
         throw error;
+      }
+      if (count !== null && count < 1) {
+        throw new Error("No gallery item was deleted. Please refresh and confirm this gallery item still exists.");
       }
       setItems((currentItems) =>
         currentItems.filter((item) => item.id !== pendingDeleteId),
