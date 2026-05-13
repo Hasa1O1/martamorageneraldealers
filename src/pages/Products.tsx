@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { publicSupabase, supabase } from "../lib/supabase";
 import { Leaf, Package } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import EditableCard from "../components/EditableCard";
@@ -59,7 +59,7 @@ export default function Products({
   useEffect(() => {
     fetchProducts();
 
-    const channel = supabase
+    const channel = publicSupabase
       .channel("products-changes")
       .on(
         "postgres_changes",
@@ -72,13 +72,13 @@ export default function Products({
     void channel.subscribe();
 
     return () => {
-      void supabase.removeChannel(channel);
+      void publicSupabase.removeChannel(channel);
     };
   }, []);
 
   async function fetchProducts() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await publicSupabase
         .from("products")
         .select("*")
         .order("display_order", { ascending: true });
@@ -121,7 +121,7 @@ export default function Products({
           .filter(Boolean),
         display_order: editingProduct.display_order || 0,
       };
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from("products")
         .update({
           name: updatedProduct.name,
@@ -130,11 +130,14 @@ export default function Products({
           image_url: updatedProduct.image_url,
           features: updatedProduct.features,
           display_order: updatedProduct.display_order,
-        })
+        }, { count: "exact" })
         .eq("id", editingProduct.id);
 
       if (error) {
         throw error;
+      }
+      if (count !== null && count < 1) {
+        throw new Error("No product was updated. Please refresh and confirm this product still exists.");
       }
       setProducts((currentProducts) =>
         currentProducts.map((product) =>
@@ -157,12 +160,15 @@ export default function Products({
 
     try {
       setDeleting(true);
-      const { error } = await supabase
+      const { error, count } = await supabase
         .from("products")
-        .delete()
+        .delete({ count: "exact" })
         .eq("id", pendingDeleteId);
       if (error) {
         throw error;
+      }
+      if (count !== null && count < 1) {
+        throw new Error("No product was deleted. Please refresh and confirm this product still exists.");
       }
       setProducts((currentProducts) =>
         currentProducts.filter((product) => product.id !== pendingDeleteId),

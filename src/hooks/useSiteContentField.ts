@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { publicSupabase } from "../lib/supabase";
 
 /**
  * Read-only site_content field with Supabase Realtime updates (same table as EditableText).
@@ -15,7 +15,7 @@ export function useSiteContentField(
     let cancelled = false;
 
     async function fetchContent() {
-      const { data, error } = await supabase
+      const { data, error } = await publicSupabase
         .from("site_content")
         .select("content")
         .eq("page", page)
@@ -33,7 +33,7 @@ export function useSiteContentField(
 
     void fetchContent();
 
-    const channel = supabase
+    const channel = publicSupabase
       .channel(`site-content-read-${page}-${section}`)
       .on(
         "postgres_changes",
@@ -61,7 +61,7 @@ export function useSiteContentField(
 
     return () => {
       cancelled = true;
-      void supabase.removeChannel(channel);
+      void publicSupabase.removeChannel(channel);
     };
   }, [page, section, defaultValue]);
 

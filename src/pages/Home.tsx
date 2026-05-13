@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Leaf, Award, Users, Heart } from "lucide-react";
-import { supabase } from "../lib/supabase";
+import { publicSupabase } from "../lib/supabase";
 import EditableText from "../components/EditableText";
 import EditableBackgroundImage from "../components/EditableBackgroundImage";
 import { useSiteContentField } from "../hooks/useSiteContentField";
@@ -61,7 +61,7 @@ export default function Home({ adminMode = false, onNavigate }: HomeProps) {
 
   async function fetchFeatureCards() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await publicSupabase
         .from("site_content")
         .select("section, content")
         .eq("page", "home")

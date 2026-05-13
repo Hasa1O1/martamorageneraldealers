@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Pencil } from "lucide-react";
-import { supabase } from "../lib/supabase";
+import { publicSupabase, supabase } from "../lib/supabase";
 import EditModal from "./EditModal";
 import { useAuth } from "../context/AuthContext";
 
@@ -31,7 +31,7 @@ export default function EditableText({
 
   useEffect(() => {
     async function fetchContent() {
-      const { data, error } = await supabase
+      const { data, error } = await publicSupabase
         .from("site_content")
         .select("content")
         .eq("page", page)
@@ -49,7 +49,7 @@ export default function EditableText({
 
     void fetchContent();
 
-    const channel = supabase.channel(`site-content-${page}-${section}`).on(
+    const channel = publicSupabase.channel(`site-content-${page}-${section}`).on(
       "postgres_changes",
       {
         event: "*",
@@ -76,7 +76,7 @@ export default function EditableText({
     void channel.subscribe();
 
     return () => {
-      void supabase.removeChannel(channel);
+      void publicSupabase.removeChannel(channel);
     };
   }, [page, section, defaultValue]);
 

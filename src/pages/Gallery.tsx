@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { publicSupabase, supabase } from "../lib/supabase";
 import { Image as ImageIcon } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import EditableCard from "../components/EditableCard";
@@ -48,7 +48,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
   useEffect(() => {
     fetchGalleryItems();
 
-    const channel = supabase
+    const channel = publicSupabase
       .channel("gallery-items-changes")
       .on(
         "postgres_changes",
@@ -61,13 +61,13 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
     void channel.subscribe();
 
     return () => {
-      void supabase.removeChannel(channel);
+      void publicSupabase.removeChannel(channel);
     };
   }, []);
 
   async function fetchGalleryItems() {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await publicSupabase
         .from("gallery_items")
         .select("*")
         .order("display_order", { ascending: true });
