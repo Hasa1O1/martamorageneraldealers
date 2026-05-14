@@ -105,20 +105,18 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
         image_url: draftItem.image_url.trim(),
         display_order: editingItem.display_order || 0,
       };
-      const { error, count } = await supabase
-        .from("gallery_items")
-        .update({
-          title: updatedItem.title,
-          description: updatedItem.description,
-          category: updatedItem.category,
-          image_url: updatedItem.image_url,
-          display_order: updatedItem.display_order,
-        }, { count: "exact" })
-        .eq("id", editingItem.id);
+      const { data: affectedRows, error } = await supabase.rpc("admin_update_gallery_item", {
+        p_id: editingItem.id,
+        p_title: updatedItem.title,
+        p_description: updatedItem.description,
+        p_category: updatedItem.category,
+        p_image_url: updatedItem.image_url,
+        p_display_order: updatedItem.display_order,
+      });
       if (error) {
         throw error;
       }
-      if (count !== null && count < 1) {
+      if (!affectedRows) {
         throw new Error("No gallery item was updated. Please refresh and confirm this gallery item still exists.");
       }
       setItems((currentItems) =>
@@ -142,14 +140,13 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
 
     try {
       setDeleting(true);
-      const { error, count } = await supabase
-        .from("gallery_items")
-        .delete({ count: "exact" })
-        .eq("id", pendingDeleteId);
+      const { data: affectedRows, error } = await supabase.rpc("admin_delete_gallery_item", {
+        p_id: pendingDeleteId,
+      });
       if (error) {
         throw error;
       }
-      if (count !== null && count < 1) {
+      if (!affectedRows) {
         throw new Error("No gallery item was deleted. Please refresh and confirm this gallery item still exists.");
       }
       setItems((currentItems) =>

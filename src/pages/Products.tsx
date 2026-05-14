@@ -121,22 +121,20 @@ export default function Products({
           .filter(Boolean),
         display_order: editingProduct.display_order || 0,
       };
-      const { error, count } = await supabase
-        .from("products")
-        .update({
-          name: updatedProduct.name,
-          description: updatedProduct.description,
-          category: updatedProduct.category,
-          image_url: updatedProduct.image_url,
-          features: updatedProduct.features,
-          display_order: updatedProduct.display_order,
-        }, { count: "exact" })
-        .eq("id", editingProduct.id);
+      const { data: affectedRows, error } = await supabase.rpc("admin_update_product", {
+        p_id: editingProduct.id,
+        p_name: updatedProduct.name,
+        p_description: updatedProduct.description,
+        p_category: updatedProduct.category,
+        p_image_url: updatedProduct.image_url,
+        p_features: updatedProduct.features,
+        p_display_order: updatedProduct.display_order,
+      });
 
       if (error) {
         throw error;
       }
-      if (count !== null && count < 1) {
+      if (!affectedRows) {
         throw new Error("No product was updated. Please refresh and confirm this product still exists.");
       }
       setProducts((currentProducts) =>
@@ -160,14 +158,13 @@ export default function Products({
 
     try {
       setDeleting(true);
-      const { error, count } = await supabase
-        .from("products")
-        .delete({ count: "exact" })
-        .eq("id", pendingDeleteId);
+      const { data: affectedRows, error } = await supabase.rpc("admin_delete_product", {
+        p_id: pendingDeleteId,
+      });
       if (error) {
         throw error;
       }
-      if (count !== null && count < 1) {
+      if (!affectedRows) {
         throw new Error("No product was deleted. Please refresh and confirm this product still exists.");
       }
       setProducts((currentProducts) =>
