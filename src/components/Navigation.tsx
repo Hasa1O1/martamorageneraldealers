@@ -1,6 +1,7 @@
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import type { AppRoute, PublicRoute } from '../appRoutes';
+import logo from '../assets/logo.png';
 
 interface NavigationProps {
   currentPage: AppRoute;
@@ -27,9 +28,7 @@ export default function Navigation({ currentPage, onNavigate }: NavigationProps)
             onClick={() => onNavigate('home')}
           >
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl" style={{ fontFamily: 'Times New Roman, serif' }}>M</span>
-              </div>
+              <img src={logo} alt="Martamora General Dealers logo" className="h-12 w-12 rounded-lg object-contain" />
               <div>
                 <h1 className="text-xl font-bold text-brown-700" style={{ fontFamily: 'Times New Roman, serif', color: '#754C29' }}>
                   Martamora

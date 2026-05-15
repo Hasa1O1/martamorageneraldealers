@@ -22,6 +22,33 @@ interface GalleryProps {
   adminMode?: boolean;
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  if (typeof error === "object" && error !== null) {
+    const possibleError = error as {
+      message?: unknown;
+      details?: unknown;
+      hint?: unknown;
+      code?: unknown;
+    };
+    const parts = [
+      possibleError.message,
+      possibleError.details,
+      possibleError.hint,
+      possibleError.code,
+    ].filter((part): part is string => typeof part === "string" && part.length > 0);
+    if (parts.length > 0) {
+      return parts.join(" ");
+    }
+  }
+  if (typeof error === "string" && error.length > 0) {
+    return error;
+  }
+  return fallback;
+}
+
 export default function Gallery({ adminMode = false }: GalleryProps) {
   const { isAdmin } = useAuth();
   const showAdminControls = isAdmin && adminMode;
@@ -128,8 +155,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
       setIsEditOpen(false);
       setEditingItem(null);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Unknown save error.";
+      const message = getErrorMessage(error, "Unknown save error.");
       setSaveError(message);
       console.error("Error saving gallery item:", error);
     }
@@ -155,11 +181,7 @@ export default function Gallery({ adminMode = false }: GalleryProps) {
       await fetchGalleryItems();
     } catch (error) {
       console.error("Error deleting gallery item:", error);
-      window.alert(
-        `Unable to delete gallery item. ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-      );
+      window.alert(`Unable to delete gallery item. ${getErrorMessage(error, "Unknown error")}`);
     } finally {
       setDeleting(false);
       setPendingDeleteId(null);

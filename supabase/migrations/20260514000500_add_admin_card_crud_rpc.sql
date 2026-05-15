@@ -1,3 +1,6 @@
+ALTER TABLE public.gallery_items
+ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+
 CREATE OR REPLACE FUNCTION public.admin_update_product(
   p_id uuid,
   p_name text,

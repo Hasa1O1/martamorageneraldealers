@@ -27,6 +27,33 @@ interface ProductsProps {
   onNavigate?: (page: PublicRoute) => void;
 }
 
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  if (typeof error === "object" && error !== null) {
+    const possibleError = error as {
+      message?: unknown;
+      details?: unknown;
+      hint?: unknown;
+      code?: unknown;
+    };
+    const parts = [
+      possibleError.message,
+      possibleError.details,
+      possibleError.hint,
+      possibleError.code,
+    ].filter((part): part is string => typeof part === "string" && part.length > 0);
+    if (parts.length > 0) {
+      return parts.join(" ");
+    }
+  }
+  if (typeof error === "string" && error.length > 0) {
+    return error;
+  }
+  return fallback;
+}
+
 export default function Products({
   adminMode = false,
   onNavigate,
@@ -146,8 +173,7 @@ export default function Products({
       setIsEditOpen(false);
       setEditingProduct(null);
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Unknown save error.";
+      const message = getErrorMessage(error, "Unknown save error.");
       setSaveError(message);
       console.error("Error saving product:", error);
     }
@@ -173,11 +199,7 @@ export default function Products({
       await fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
-      window.alert(
-        `Unable to delete product. ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-      );
+      window.alert(`Unable to delete product. ${getErrorMessage(error, "Unknown error")}`);
     } finally {
       setDeleting(false);
       setPendingDeleteId(null);
